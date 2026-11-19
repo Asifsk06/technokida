@@ -1,1 +1,83 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Free online word counter. Instantly count words, characters, sentences and paragraphs.">
+<title>Free Word Counter | TechnoKida</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#f9f1ff,#eef7ff);color:#171735;min-height:100vh}
+header{background:white;padding:20px 7%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{text-decoration:none;color:#171735;font-size:24px;font-weight:800}
+.logo{font-weight:900;font-style:italic;letter-spacing:-4px;padding-right:7px;background:linear-gradient(135deg,#315aff,#8b35e9,#ff319c);background-clip:text;-webkit-background-clip:text;color:transparent}
+.brand span:last-child{color:#a12fe4}
+header a.back{color:#6334db;text-decoration:none;font-weight:bold}
+main{max-width:950px;margin:55px auto;padding:0 20px}
+h1{text-align:center;font-size:clamp(32px,5vw,48px);margin-bottom:12px}
+.intro{text-align:center;color:#626783;font-size:17px;margin-bottom:30px}
+.panel{background:white;border:1px solid #e9e5f6;border-radius:22px;padding:25px;box-shadow:0 10px 35px #33276c12}
+textarea{width:100%;min-height:250px;padding:20px;border:2px solid #e4dff4;border-radius:15px;resize:vertical;font:16px/1.6 Arial,sans-serif;outline:none}
+textarea:focus{border-color:#8351ec}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin-top:20px}
+.stat{padding:20px 10px;border-radius:15px;background:#f3edff;text-align:center}
+.stat:nth-child(2){background:#e9f4ff}.stat:nth-child(3){background:#fff0f7}.stat:nth-child(4){background:#e9faf1}
+.stat strong{display:block;font-size:30px;color:#5934dc;margin-bottom:8px}
+.stat span{font-size:14px;color:#555a76}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+button{border:0;border-radius:12px;padding:13px 23px;font-size:15px;font-weight:bold;cursor:pointer}
+.primary{background:linear-gradient(90deg,#713ce9,#ab41e6);color:white}
+.secondary{background:#edeafa;color:#4d36aa}
+.note{margin-top:30px;line-height:1.7;color:#565b77}
+footer{text-align:center;color:#777b92;padding:30px}
+</style>
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><span class="logo">TK</span> Techno<span>Kida</span></a>
+<a class="back" href="index.html">← Back to Home</a>
+</header>
+<main>
+<h1>📝 Free Word Counter</h1>
+<p class="intro">Count words, characters, sentences and paragraphs instantly.</p>
+<div class="panel">
+<label for="editor"><strong>Enter or paste your text below</strong></label>
+<textarea id="editor" placeholder="Start typing or paste your text here..." aria-label="Text to count"></textarea>
+<div class="stats" aria-live="polite">
+<div class="stat"><strong id="words">0</strong><span>Words</span></div>
+<div class="stat"><strong id="characters">0</strong><span>Characters</span></div>
+<div class="stat"><strong id="sentences">0</strong><span>Sentences</span></div>
+<div class="stat"><strong id="paragraphs">0</strong><span>Paragraphs</span></div>
+</div>
+<div class="actions">
+<button class="primary" id="copy">Copy Text</button>
+<button class="secondary" id="clear">Clear Text</button>
+</div>
+</div>
+<div class="note">
+<h2>How to use the Word Counter</h2>
+<p>Type or paste your text into the box. The counters update automatically as you type. No sign-up is required.</p>
+</div>
+</main>
+<footer>© 2026 TechnoKida. All rights reserved.</footer>
+<script>
+const editor=document.getElementById('editor');
+function update(){
+const text=editor.value;
+const trimmed=text.trim();
+document.getElementById('words').textContent=trimmed?(trimmed.match(/\S+/gu)||[]).length:0;
+document.getElementById('characters').textContent=[...text].length;
+document.getElementById('sentences').textContent=trimmed?(trimmed.match(/[^.!?\n]+[.!?]+|[^.!?\n]+$/gm)||[]).filter(x=>x.trim()).length:0;
+document.getElementById('paragraphs').textContent=trimmed?trimmed.split(/\n\s*\n|\n(?=\S)/).filter(x=>x.trim()).length:0;
+}
+editor.addEventListener('input',update);
+document.getElementById('clear').addEventListener('click',()=>{editor.value='';update();editor.focus()});
+document.getElementById('copy').addEventListener('click',async()=>{
+if(!editor.value)return;
+try{await navigator.clipboard.writeText(editor.value);document.getElementById('copy').textContent='Copied!';setTimeout(()=>document.getElementById('copy').textContent='Copy Text',1500)}
+catch(e){alert('Copy failed. Please select the text and copy manually.')}
+});
+update();
+</script>
+</body>
+</html>
