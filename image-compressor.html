@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Compress JPG, PNG and WebP images online for free with TechnoKida. No server upload required.">
+<title>Free Image Compressor | TechnoKida</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;color:#171735;background:linear-gradient(135deg,#f9f1ff,#eef7ff);min-height:100vh}
+header{background:white;padding:20px 7%;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.brand{text-decoration:none;color:#171735;font-size:24px;font-weight:800}
+.logo{font-weight:900;font-style:italic;letter-spacing:-4px;padding-right:7px;background:linear-gradient(135deg,#315aff,#8b35e9,#ff319c);background-clip:text;-webkit-background-clip:text;color:transparent}
+.brand span:last-child{color:#a12fe4}
+.back{color:#6334db;text-decoration:none;font-weight:bold}
+main{max-width:850px;margin:50px auto;padding:0 20px}
+h1{text-align:center;font-size:clamp(32px,5vw,46px)}
+.intro{text-align:center;color:#626783;font-size:17px;line-height:1.6;margin-bottom:30px}
+.panel{background:white;border:1px solid #e9e5f6;border-radius:22px;padding:28px;box-shadow:0 10px 35px #33276c12}
+.upload{display:block;border:2px dashed #aa91ed;background:#f8f4ff;border-radius:16px;padding:32px 15px;text-align:center;cursor:pointer}
+.upload strong{display:block;font-size:19px;margin-bottom:10px}
+.upload span{color:#656987}
+input[type=file]{display:none}
+.settings{margin:25px 0}
+.settings label{display:flex;justify-content:space-between;font-weight:bold;margin-bottom:12px}
+input[type=range]{width:100%;accent-color:#7541e9}
+select{padding:12px;border:1px solid #d9d2ed;border-radius:10px;width:100%;font-size:15px;background:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:22px}
+.preview{border:1px solid #e9e5f6;border-radius:16px;padding:16px;text-align:center;background:#faf9ff}
+.preview img{max-width:100%;height:190px;object-fit:contain}
+.preview strong{display:block;margin:12px 0}
+.preview p{color:#626783}
+button{border:0;border-radius:12px;padding:14px 22px;font-size:15px;font-weight:bold;cursor:pointer;background:linear-gradient(90deg,#713ce9,#ab41e6);color:white}
+button:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.secondary{background:#edeafa;color:#4d36aa}
+.result{font-weight:bold;color:#267b50;margin-top:18px}
+.note{color:#626783;line-height:1.7;margin-top:22px}
+footer{text-align:center;color:#777b92;padding:30px}
+</style>
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><span class="logo">TK</span> Techno<span>Kida</span></a>
+<a class="back" href="index.html">← Back to Home</a>
+</header>
+<main>
+<h1>🖼️ Free Image Compressor</h1>
+<p class="intro">Reduce image file size in seconds. Fast, free and private — processed in your browser.</p>
+<div class="panel">
+<label class="upload" for="file">
+<strong>📁 Click to Upload an Image</strong>
+<span>JPG, PNG or WebP — maximum 20 MB</span>
+</label>
+<input id="file" type="file" accept="image/jpeg,image/png,image/webp">
+<div class="settings">
+<label for="quality">Compression Quality <span id="qualityValue">70%</span></label>
+<input id="quality" type="range" min="10" max="95" value="70">
+<p class="note">Lower quality generally means a smaller file.</p>
+<label for="format">Output Format</label>
+<select id="format">
+<option value="image/jpeg">JPG (smaller photos)</option>
+<option value="image/webp">WebP (modern format)</option>
+</select>
+</div>
+<div class="grid">
+<div class="preview">
+<strong>Original Image</strong>
+<img id="originalPreview" alt="Original preview" hidden>
+<p id="originalSize">No image selected</p>
+</div>
+<div class="preview">
+<strong>Compressed Image</strong>
+<img id="compressedPreview" alt="Compressed preview" hidden>
+<p id="compressedSize">Not compressed yet</p>
+</div>
+</div>
+<div class="actions">
+<button id="compress" disabled>Compress Image</button>
+<button id="download" class="secondary" disabled>Download Image</button>
+</div>
+<p class="result" id="result" role="status" aria-live="polite"></p>
+</div>
+<h2>How to use Image Compressor</h2>
+<p class="note">Upload a photo, select quality and output format, then click Compress Image. Compare the file sizes and download your result. PNG transparency becomes white when converted to JPG. The image dimensions are preserved, so some files may become larger instead of smaller.</p>
+</main>
+<footer>© 2026 TechnoKida. All rights reserved.</footer>
+<script>
+const fileInput=document.getElementById("file");
+const quality=document.getElementById("quality");
+const format=document.getElementById("format");
+const compressBtn=document.getElementById("compress");
+const downloadBtn=document.getElementById("download");
+const originalPreview=document.getElementById("originalPreview");
+const compressedPreview=document.getElementById("compressedPreview");
+const originalSize=document.getElementById("originalSize");
+const compressedSize=document.getElementById("compressedSize");
+const result=document.getElementById("result");
+let selectedFile=null;
+let originalURL=null;
+let compressedURL=null;
+let compressedBlob=null;
+
+function size(bytes){
+ return bytes>=1048576
+ ?(bytes/1048576).toFixed(2)+" MB"
+ :(bytes/1024).toFixed(1)+" KB";
+}
+function resetCompressed(){
+ if(compressedURL)URL.revokeObjectURL(compressedURL);
+ compressedURL=null;
+ compressedBlob=null;
+ compressedPreview.hidden=true;
+ compressedPreview.removeAttribute("src");
+ compressedSize.textContent="Not compressed yet";
+ downloadBtn.disabled=true;
+ result.textContent="";
+}
+quality.addEventListener("input",()=>{
+ document.getElementById("qualityValue").textContent=quality.value+"%";
+ resetCompressed();
+});
+format.addEventListener("change",resetCompressed);
+fileInput.addEventListener("change",()=>{
+ resetCompressed();
+ if(originalURL)URL.revokeObjectURL(originalURL);
+ originalURL=null;
+ selectedFile=null;
+ originalPreview.hidden=true;
+ compressBtn.disabled=true;
+ const file=fileInput.files[0];
+ if(!file)return;
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+  result.textContent="Please select a JPG, PNG or WebP image.";
+  return;
+ }
+ if(file.size>20*1024*1024){
+  result.textContent="Please select an image under 20 MB.";
+  return;
+ }
+ selectedFile=file;
+ originalURL=URL.createObjectURL(file);
+ originalPreview.src=originalURL;
+ originalPreview.hidden=false;
+ originalSize.textContent=size(file.size);
+ compressBtn.disabled=false;
+});
+compressBtn.addEventListener("click",async()=>{
+ if(!selectedFile)return;
+ resetCompressed();
+ compressBtn.disabled=true;
+ result.textContent="Compressing image...";
+ try{
+  const img=new Image();
+  img.src=originalURL;
+  await img.decode();
+  const canvas=document.createElement("canvas");
+  canvas.width=img.naturalWidth;
+  canvas.height=img.naturalHeight;
+  const ctx=canvas.getContext("2d");
+  if(!ctx)throw new Error("Canvas unavailable");
+  if(format.value==="image/jpeg"){
+   ctx.fillStyle="#ffffff";
+   ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+  ctx.drawImage(img,0,0);
+  const type=format.value;
+  const blob=await new Promise(resolve=>
+   canvas.toBlob(resolve,type,Number(quality.value)/100)
+  );
+  if(!blob||blob.type!==type)throw new Error("Encoding failed");
+  compressedBlob=blob;
+  compressedURL=URL.createObjectURL(blob);
+  compressedPreview.src=compressedURL;
+  compressedPreview.hidden=false;
+  compressedSize.textContent=size(blob.size);
+  const reduction=(1-blob.size/selectedFile.size)*100;
+  result.textContent=reduction>=0
+   ?"File size reduced by "+reduction.toFixed(1)+"%!"
+   :"Output is "+Math.abs(reduction).toFixed(1)+"% larger. Try lower quality or another format.";
+  downloadBtn.disabled=false;
+ }catch(e){
+  result.textContent="Could not compress this image. Try another file.";
+ }finally{
+  compressBtn.disabled=false;
+ }
+});
+downloadBtn.addEventListener("click",()=>{
+ if(!compressedURL||!compressedBlob)return;
+ const ext=compressedBlob.type==="image/webp"?"webp":"jpg";
+ const a=document.createElement("a");
+ a.href=compressedURL;
+ a.download="technokida-compressed."+ext;
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+});
+</script>
+</body>
+</html>
