@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Learn about TechnoKida, our founder, mission and free online tools for everyday digital tasks.">
 <title>About Us | TechnoKida</title>
+  <link rel="icon" type="image/png" sizes="512x512" href="/TechnoKida_Icon_512x512.png">
 <style>
 *{box-sizing:border-box}
 body{
@@ -24,22 +25,25 @@ header{
   flex-wrap:wrap;
   gap:15px;
 }
-.brand{
-  text-decoration:none;
-  font-size:24px;
-  font-weight:800;
-  color:#20213d;
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
 }
-.logo{
-  font-style:italic;
-  letter-spacing:-4px;
-  padding-right:7px;
-  background:linear-gradient(135deg,#315aff,#8b35e9,#ff319c);
-  background-clip:text;
-  -webkit-background-clip:text;
-  color:transparent;
+
+.brand-logo {
+  display: block;
+  width: 210px;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
-.brand span:last-child{color:#a12fe4}
+
+@media (max-width: 650px) {
+  .brand-logo {
+    width: 170px;
+  }
+}
 .back{
   color:#6334db;
   text-decoration:none;
@@ -123,10 +127,17 @@ footer{text-align:center;padding:30px;color:#777b92}
 <body>
 
 <header>
-<a class="brand" href="index.html">
-  <span class="logo">TK</span> Techno<span>Kida</span>
-</a>
-<a class="back" href="index.html">← Back to Home</a>
+  <a class="brand" href="/" aria-label="TechnoKida Home">
+    <img
+      src="/TechnoKida_3x1_3000x1000.png"
+      alt="TechnoKida - Your Digital Problem Solver"
+      class="brand-logo"
+      width="210"
+      height="70"
+    >
+  </a>
+
+  <a class="back" href="/">← Back to Home</a>
 </header>
 
 <main>
