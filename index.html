@@ -64,6 +64,27 @@ footer{background:#171735;color:#d9d9ee;text-align:center;padding:28px 15px;marg
   .top-visual{background-position:center center}
   .top-visual .hero{min-height:440px}
 }
+  #toolList .tool {
+    position: relative;
+    cursor: pointer;
+}
+
+#toolList .tool a {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    z-index: 2;
+}
+
+#toolList .tool:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+#toolList .tool:focus-within {
+    outline: 2px solid #635bdb;
+}
 </style>
 </head>
 <body>
